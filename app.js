@@ -47,16 +47,6 @@ d3.csv("data.csv", function(error, healthData) {
 		data.healthStatus = +data.healthStatus;
 	});
 
-	//Set the domaine of the xBandScale poverty data.
-	xBandScale.domain(healthData.map(function(data){
-		return data.poverty;
-	}));
-
-	//Set the yScaleLinear function to the health status data.
-	yLinearScale.domain(healthData.map(function(data){
-		return data.healthStatus;
-	}));
-
 	//Create the axis functions.
 	var bottomAxis = d3.axisBottom(xBandScale);
 	var leftAxis = d3.axisLeft(yLinearScale);
@@ -78,7 +68,9 @@ d3.csv("data.csv", function(error, healthData) {
 	 chart.selectAll("circle")
 	  .data(healthData)
 	  .enter().append("circle")
-	    .attr("class", "scatter")
+	    .attr("class", "circle")
+	    .attr("r", 15)
+	    .attr("fill", "blue")
 	    .attr("cx", function(data, index) {
 	    	console.log(data.poverty);
 	    	return xBandScale(data.poverty);
@@ -87,8 +79,11 @@ d3.csv("data.csv", function(error, healthData) {
 	    	console.log(data.healthStatus);
 	    	return yLinearScale(data.healthStatus);
 	    })
-	    .attr("r", 15)
-	    .attr("fill", "blue");
+	    .attr("width", xBandScale.bandwidth())
+        .attr("height", function(data) {
+          return chartHeight - yLinearScale(data.RIDERS_PER_WEEKDAY);
+        });
+	    
 	    //.on("click", function(data) {
 	    	//toolTip.show(data);
 	    //);
