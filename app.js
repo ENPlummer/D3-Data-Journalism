@@ -29,67 +29,75 @@ var chart = svg.append("g");
 d3.select(".chart")
   .append("div")
   .attr("class", "tooltip")
-  .style("opacity", 0);
+  .style("opacity", 1);
 
-//Create the xBandScale function.
-var xBandScale = d3.scaleBand().range([0, chartWidth]).padding(0.1);
-
-//Create the yLinearScale function.
-
-var yLinearScale = d3.scaleLinear().range([chartHeight,0]);
-
-//Load the data from the data.csv file.
-d3.csv("data.csv", function(error, healthData) {
+//Load the CSV file.
+d3.csv("data/data.csv", function(error,healthData){
 	if (error) throw error;
 
-	healthData.forEach(function(data) {
+	healthData.forEach(function(data){
 		data.poverty = +data.poverty;
 		data.healthStatus = +data.healthStatus;
 	});
 
+
+	//Create the xBandScale function.
+	var xLinearScale = d3.scaleLinear().range([0, chartWidth]);
+
+	//Create the yLinearScale function.
+
+	var yLinearScale = d3.scaleLinear().range([chartHeight,0]);
+
+	
+
 	//Create the axis functions.
-	var bottomAxis = d3.axisBottom(xBandScale);
+	var bottomAxis = d3.axisBottom(xLinearScale);
 	var leftAxis = d3.axisLeft(yLinearScale);
 
-	//Associate the tooltips with the data.
-	//var toolTip = d3.tip()
-	 // .attr("class", "toolTip")
-	  //.offset([80, -60])
-	  //.html(function(data){
-	    //var state = data.state;
-	    //var povertyRate = data.poverty;
-	    //var healthStatus = data.healthStatus;
-	    //return (state + "<br> Poverty Rate: " + povertyRate + "<br> Percentage of the population in fair or poor health: " + healthStatus);
-	  //});
+	//Scale the domain.
+	xLinearScale.domain([0, d3.max(healthData, function(data){
+		return +data.poverty;
+	})]);
 
-	     //chart.call(toolTip);
+	yLinearScale.domain([0, d3.max(healthData,function(data){
+		return +data.healthStatus;
+	})]);
+
+	//Associate the tooltips with the data.
+	var toolTip = d3.tip()
+	  .attr("class", "toolTip")
+	  .offset([80, -60])
+	  .html(function(data) {
+	    var state = data.state;
+	    var povertyRate = +data.poverty;
+	    var healthStatus = +data.healthStatus;
+	    return (state + "<br> Poverty Rate: " + povertyRate + "<br> Percentage of the population in fair or poor health: " + healthStatus);
+	  });
+
+	 chart.call(toolTip);
 
 	//Function to append the data points to the chart.
 	 chart.selectAll("circle")
 	  .data(healthData)
 	  .enter().append("circle")
-	    .attr("class", "circle")
-	    .attr("r", 15)
-	    .attr("fill", "blue")
 	    .attr("cx", function(data, index) {
 	    	console.log(data.poverty);
-	    	return xBandScale(data.poverty);
+	    	return xLinearScale(data.poverty);
 	    })
 	    .attr("cy", function(data, index) {
 	    	console.log(data.healthStatus);
 	    	return yLinearScale(data.healthStatus);
 	    })
-	    .attr("width", xBandScale.bandwidth())
-        .attr("height", function(data) {
-          return chartHeight - yLinearScale(data.RIDERS_PER_WEEKDAY);
-        });
-	    
-	    //.on("click", function(data) {
-	    	//toolTip.show(data);
-	    //);
+	    .attr("r", "15")
+	    .attr("fill","blue")
+	    .style("opacity", 0.5)
+	    .on("click", function(data) {
+	    	toolTip.show(data);
+	    })
 	    //On mouseout event.
-	    //on("mouseout", function(data, index) {
-	    	//toolTip.hide(data);
+	    .on("mouseout", function(data, index) {
+	    	toolTip.hide(data);
+	    });	
 
 	  //Append the bottom axis.
 	  chart.append("g")
@@ -101,19 +109,18 @@ d3.csv("data.csv", function(error, healthData) {
        .call(leftAxis);
 
      //Append the y-axis labels.
-     //chart.append("text")
-       //.attr("transform", "rotate(-90)")
-       //.attr("y", 0 - margin.left + 40)
-       //.attr("x", 0 - (chartHeight/2))
-       //.attr("dy", "1em")
-       //.attr("class", "axisText")
-       //.attr("Percentage of the Population in Fair or Poor Health");
+     chart.append("text")
+       .attr("transform", "rotate(-90)")
+       .attr("y", 0 - margin.left + 40)
+       .attr("x", 0 - (chartHeight/2))
+       .attr("dy", "1em")
+       .text("Percentage of the Population in Fair or Poor Health");
 
      //Append the x-axis labels.
-    //chart.append("text")
-     // .attr("transform", "translate(" + (chartWidth / 2) + "," + (chartHeight + margin.top + 30) + ")") 
-      //.attr("class", "axisText")
-      //.attr("Percentage of the Population Below the Poverty Line");
+    chart.append("text")
+     .attr("transform", "translate(" + (chartWidth / 2) + "," + (chartHeight + margin.top + 30) + ")") 
+     .attr("class", "axisText")
+     .attr("Percentage of the Population Below the Poverty Line");
 
 });
 
