@@ -1,11 +1,11 @@
 //Define the SVG area dimensions.
-var svgWidth = 1000
-var svgHeight = 500
+var svgWidth = 950;
+var svgHeight = 750;
 
 //Define the chart's margins as an object.
 var margin = {
-	top: 100,
-	right: 100,
+	top: 60,
+	right: 40,
 	bottom: 100,
 	left: 100
 };
@@ -88,7 +88,7 @@ d3.csv("data/data.csv", function(error,healthData){
 	    	console.log(data.healthStatus);
 	    	return yLinearScale(data.healthStatus);
 	    })
-	    .attr("r", "15")
+	    .attr("r", "10")
 	    .attr("fill","blue")
 	    .style("opacity", 0.5)
 	    .on("click", function(data) {
@@ -112,15 +112,16 @@ d3.csv("data/data.csv", function(error,healthData){
      chart.append("text")
        .attr("transform", "rotate(-90)")
        .attr("y", 0 - margin.left + 40)
-       .attr("x", 0 - (chartHeight/2))
+       .attr("x", 0 - (chartHeight))
        .attr("dy", "1em")
+       .attr("class", "axisText")
        .text("Percentage of the Population in Fair or Poor Health");
 
      //Append the x-axis labels.
     chart.append("text")
-     .attr("transform", "translate(" + (chartWidth / 2) + "," + (chartHeight + margin.top + 30) + ")") 
+     .attr("transform", "translate(" + (chartWidth/3) + "," + (chartHeight + margin.top + 30) + ")") 
      .attr("class", "axisText")
-     .attr("Percentage of the Population Below the Poverty Line");
+     .text("Percentage of the Population Below the Poverty Line");
 
 });
 
